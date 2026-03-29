@@ -43,7 +43,7 @@ function MarketRow({ market, data }: { market: string; data: { roas: number; cpa
     <div className="flex items-center justify-between text-sm py-1.5 border-b border-border last:border-0">
       <span className="flex items-center gap-1.5 text-text-dim text-xs">
         {MARKET_FLAGS[market]} {market}
-        {data.is_outlier && <AlertTriangle size={10} className="text-yellow-400" title="Outlier vs blended" />}
+        {data.is_outlier && <span title="Outlier vs blended"><AlertTriangle size={10} className="text-yellow-400" /></span>}
       </span>
       <div className="flex gap-4">
         <span className={`font-display font-bold ${good ? 'text-accent' : 'text-loser'}`}>{data.roas.toFixed(2)}x</span>
