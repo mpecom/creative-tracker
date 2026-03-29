@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     })
 
   // Unique angles for filter
-  const angles = [...new Set((briefs as Brief[]).map(b => b.angle))].filter(Boolean)
+  const angles = Array.from(new Set((briefs as Brief[]).map(b => b.angle))).filter(Boolean)
 
   return NextResponse.json({ cards, angles })
 }
