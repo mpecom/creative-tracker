@@ -21,7 +21,7 @@ export function aggregateCreativeCard(
     return {
       brief,
       creative,
-      blended: { roas: 0, cpa: 0, spend: 0, conversions: 0, ctr: 0 },
+      blended: { roas: 0, cpa: 0, spend: 0, conversions: 0, ctr: 0, thumbstop_rate: 0 },
       by_campaign: {},
       by_market: {},
       is_winner: false,
@@ -37,6 +37,11 @@ export function aggregateCreativeCard(
   const blendedRoas = totalSpend > 0 ? totalRevenue / totalSpend : 0
   const blendedCpa = totalConversions > 0 ? totalSpend / totalConversions : 0
   const blendedCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0
+  const thumbstopRows = performances.filter(p => p.thumbstop_rate != null)
+  const blendedThumbstop = thumbstopRows.length > 0
+    ? thumbstopRows.reduce((s, p) => s + (p.thumbstop_rate ?? 0) * p.impressions, 0) /
+      (thumbstopRows.reduce((s, p) => s + p.impressions, 0) || 1)
+    : 0
 
   // By campaign type
   const byCampaign: CreativeCard['by_campaign'] = {}
@@ -79,6 +84,7 @@ export function aggregateCreativeCard(
       spend: totalSpend,
       conversions: totalConversions,
       ctr: blendedCtr,
+      thumbstop_rate: blendedThumbstop,
     },
     by_campaign: byCampaign,
     by_market: byMarket,

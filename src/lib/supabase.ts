@@ -58,6 +58,7 @@ export interface CreativeCard {
     spend: number
     conversions: number
     ctr: number
+    thumbstop_rate: number
   }
   by_campaign: {
     ABO?: { roas: number; cpa: number; spend: number }

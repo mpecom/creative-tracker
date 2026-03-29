@@ -14,11 +14,12 @@ const MARKET_FLAGS: Record<string, string> = {
   NL: '🇳🇱', FR: '🇫🇷', DE: '🇩🇪', ES: '🇪🇸', IT: '🇮🇹'
 }
 
-function Metric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Metric({ label, value, accent, sub }: { label: string; value: string; accent?: boolean; sub?: string }) {
   return (
     <div className="flex flex-col">
       <span className="text-text-dim text-xs">{label}</span>
-      <span className={`font-display font-bold text-base ${accent ? 'text-accent' : 'text-text'}`}>{value}</span>
+      <span className={`font-display font-bold text-base leading-tight ${accent ? 'text-accent' : 'text-text'}`}>{value}</span>
+      {sub && <span className="text-muted text-xs">{sub}</span>}
     </div>
   )
 }
@@ -85,9 +86,12 @@ export default function CreativeCardComponent({ card, onLinkAd }: Props) {
               <div className="flex items-center gap-2">
                 <span className="font-display font-bold text-accent text-sm">{brief.concept_id}</span>
                 {is_winner && <Trophy size={12} className="text-accent" />}
+                <span className="text-muted text-xs bg-border px-1.5 py-0.5 rounded font-display font-bold uppercase tracking-wide">
+                  {brief.format}
+                </span>
               </div>
               <p className="text-text text-sm font-display font-bold truncate">{brief.angle}</p>
-              <p className="text-text-dim text-xs truncate">{brief.format} · {brief.hook}</p>
+              <p className="text-text-dim text-xs truncate">{brief.hook}</p>
             </div>
           </div>
           {/* Markets */}
@@ -101,10 +105,17 @@ export default function CreativeCardComponent({ card, onLinkAd }: Props) {
 
       {/* Metrics row */}
       {hasData ? (
-        <div className="px-4 pb-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
+        <div className="px-4 pb-3 grid grid-cols-4 gap-2 border-t border-border pt-3">
           <Metric label="ROAS" value={`${blended.roas.toFixed(2)}x`} accent={is_winner} />
           <Metric label="CPA" value={`€${blended.cpa.toFixed(0)}`} />
-          <Metric label="Spend" value={blended.spend >= 1000 ? `€${(blended.spend/1000).toFixed(1)}k` : `€${blended.spend.toFixed(0)}`} />
+          <Metric
+            label="Hook"
+            value={blended.thumbstop_rate > 0 ? `${(blended.thumbstop_rate * 100).toFixed(1)}%` : '—'}
+          />
+          <Metric
+            label="CTR"
+            value={blended.ctr > 0 ? `${blended.ctr.toFixed(2)}%` : '—'}
+          />
         </div>
       ) : (
         <div className="px-4 pb-3 border-t border-border pt-3">
@@ -113,11 +124,21 @@ export default function CreativeCardComponent({ card, onLinkAd }: Props) {
               onClick={onLinkAd}
               className="flex items-center gap-1.5 text-xs text-accent hover:text-accent-dim transition-colors font-display font-bold"
             >
-              <Link2 size={12} /> Link Meta Ad
+              <Link2 size={12} /> Link Facebook Ad
             </button>
           ) : (
             <p className="text-muted text-xs">Waiting for data from n8n…</p>
           )}
+        </div>
+      )}
+
+      {/* Spend sub-line */}
+      {hasData && (
+        <div className="px-4 pb-2 -mt-1">
+          <span className="text-muted text-xs">
+            €{blended.spend >= 1000 ? `${(blended.spend/1000).toFixed(1)}k` : blended.spend.toFixed(0)} spend
+            · {blended.conversions} conv
+          </span>
         </div>
       )}
 
@@ -154,14 +175,14 @@ export default function CreativeCardComponent({ card, onLinkAd }: Props) {
         </div>
       )}
 
-      {/* Footer: link ad if not linked */}
+      {/* Footer: link ad if no creative */}
       {hasData && !creative && (
         <div className="px-4 pb-3">
           <button
             onClick={onLinkAd}
             className="flex items-center gap-1.5 text-xs text-accent hover:text-accent-dim transition-colors font-display font-bold"
           >
-            <Link2 size={12} /> Link Meta Ad
+            <Link2 size={12} /> Link Facebook Ad
           </button>
         </div>
       )}

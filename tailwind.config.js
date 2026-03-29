@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -8,17 +9,17 @@ module.exports = {
         body: ['var(--font-body)', 'sans-serif'],
       },
       colors: {
-        bg: '#0a0a0f',
-        surface: '#111118',
-        border: '#1e1e2e',
-        accent: '#c8f135',
-        'accent-dim': '#8fb520',
-        muted: '#4a4a6a',
-        text: '#e8e8f0',
-        'text-dim': '#8888aa',
-        winner: '#c8f135',
+        bg: 'rgb(var(--color-bg) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        border: 'rgb(var(--color-border) / <alpha-value>)',
+        accent: 'rgb(var(--color-accent) / <alpha-value>)',
+        'accent-dim': 'rgb(var(--color-accent-dim) / <alpha-value>)',
+        muted: 'rgb(var(--color-muted) / <alpha-value>)',
+        text: 'rgb(var(--color-text) / <alpha-value>)',
+        'text-dim': 'rgb(var(--color-text-dim) / <alpha-value>)',
+        winner: 'rgb(var(--color-accent) / <alpha-value>)',
         loser: '#ff4d6d',
-        neutral: '#8888aa',
+        neutral: 'rgb(var(--color-muted) / <alpha-value>)',
       },
     },
   },
