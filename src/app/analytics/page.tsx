@@ -138,7 +138,7 @@ function CountryTable({ rows }: { rows: GroupRow[] }) {
                   </span>
                 </td>
                 <td className="px-4 py-3 min-w-[160px]">
-                  <RoasBar roas={row.roas} max={Math.max(...rows.map(r => r.roas))} />
+                  <RoasBar roas={row.roas} max={Math.max(...rows.map(r => r.roas), 0.1)} />
                 </td>
                 <td className="px-4 py-3 text-right text-sm text-text-dim font-body">
                   {row.cpa > 0 ? fmt(row.cpa) : '—'}
@@ -188,8 +188,8 @@ export default function Analytics() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const maxFormatRoas = data ? Math.max(...data.by_format.map(r => r.roas), 0.1) : 1
-  const maxAngleRoas = data ? Math.max(...data.by_angle.map(r => r.roas), 0.1) : 1
+  const maxFormatRoas = data && data.by_format.length > 0 ? Math.max(...data.by_format.map(r => r.roas), 0.1) : 1
+  const maxAngleRoas = data && data.by_angle.length > 0 ? Math.max(...data.by_angle.map(r => r.roas), 0.1) : 1
 
   const MARKETS = ['all', 'NL', 'FR', 'DE', 'ES', 'IT']
 

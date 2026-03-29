@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase, Brief, Creative, AdPerformance, Market } from '@/lib/supabase'
+import { supabase, Brief, Creative, AdPerformance } from '@/lib/supabase'
 
 interface GroupStats {
   key: string

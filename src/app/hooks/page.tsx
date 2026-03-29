@@ -56,7 +56,7 @@ export default function Hooks() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const maxThumbstop = Math.max(...hooks.map(h => h.thumbstop_rate), 0.01)
+  const maxThumbstop = hooks.length > 0 ? Math.max(...hooks.map(h => h.thumbstop_rate), 0.01) : 0.01
   const withData = hooks.filter(h => h.spend > 0)
   const noData = hooks.filter(h => h.spend === 0)
 
