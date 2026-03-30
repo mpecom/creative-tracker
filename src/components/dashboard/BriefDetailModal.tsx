@@ -139,7 +139,7 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
               <button key={s} onClick={() => setForm(f => ({ ...f, awareness_stage: s }))}
                 className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold border transition-colors ${
                   form.awareness_stage === s
-                    ? 'bg-accent text-bg border-accent'
+                    ? 'bg-accent text-white border-accent'
                     : 'bg-bg border-border text-text-dim hover:text-text'
                 }`}
               >
@@ -284,7 +284,7 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
             Cancel
           </button>
           <button onClick={handleSave} disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-accent text-bg text-sm font-display font-bold hover:bg-accent-dim transition-colors disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-display font-bold hover:bg-accent-dim transition-colors disabled:opacity-50"
           >
             <Save size={14} />
             {saving ? 'Saving…' : 'Save Changes'}

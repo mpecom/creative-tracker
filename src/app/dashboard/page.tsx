@@ -186,7 +186,7 @@ export default function Dashboard() {
             <p className="text-sm mt-2">Add your first brief to get started</p>
             <button
               onClick={() => setShowAddBrief(true)}
-              className="mt-4 inline-flex items-center gap-2 bg-accent text-bg px-5 py-2.5 rounded-lg text-sm font-display font-bold hover:bg-accent-dim transition-colors"
+              className="mt-4 inline-flex items-center gap-2 bg-accent text-white px-5 py-2.5 rounded-lg text-sm font-display font-bold hover:bg-accent-dim transition-colors"
             >
               + New Brief
             </button>

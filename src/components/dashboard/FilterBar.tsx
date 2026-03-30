@@ -21,7 +21,7 @@ export default function FilterBar({ days, setDays, market, setMarket, angle, set
             key={d}
             onClick={() => setDays(d)}
             className={`px-3 py-1.5 text-sm font-display font-bold transition-colors ${
-              days === d ? 'bg-accent text-bg' : 'text-text-dim hover:text-text'
+              days === d ? 'bg-accent text-white' : 'text-text-dim hover:text-text'
             }`}
           >
             {d}d
@@ -36,7 +36,7 @@ export default function FilterBar({ days, setDays, market, setMarket, angle, set
             key={m}
             onClick={() => setMarket(m)}
             className={`px-3 py-1.5 text-sm font-display font-bold transition-colors ${
-              market === m ? 'bg-accent text-bg' : 'text-text-dim hover:text-text'
+              market === m ? 'bg-accent text-white' : 'text-text-dim hover:text-text'
             }`}
           >
             {m === 'all' ? 'All' : m}
@@ -63,7 +63,7 @@ export default function FilterBar({ days, setDays, market, setMarket, angle, set
             key={g}
             onClick={() => setGroupBy(g)}
             className={`px-3 py-1.5 text-xs font-display font-bold uppercase tracking-wide transition-colors ${
-              groupBy === g ? 'bg-accent text-bg' : 'text-text-dim hover:text-text'
+              groupBy === g ? 'bg-accent text-white' : 'text-text-dim hover:text-text'
             }`}
           >
             {g}
