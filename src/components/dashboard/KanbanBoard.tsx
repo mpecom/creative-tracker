@@ -3,7 +3,7 @@ import { useState, ComponentType } from 'react'
 import { BriefStatus, CreativeCard } from '@/lib/supabase'
 import {
   Lightbulb, FileText, Video, Eye, ArrowRight, Wifi, TrendingUp,
-  ChevronRight, ChevronLeft, ExternalLink, Tag, CalendarDays, Trophy, Link2
+  ChevronRight, ChevronLeft, ExternalLink, Tag, Trophy, Link2
 } from 'lucide-react'
 
 interface Props {
@@ -176,8 +176,7 @@ function KanbanCard({ card, col, onMove, onClick }: {
             </div>
           </div>
           {brief.due_date && (
-            <span className={`flex items-center gap-1 text-xs ${isOverdue ? 'text-red-400' : 'text-text-dim'}`}>
-              <CalendarDays size={10} />
+            <span className={`text-xs ${isOverdue ? 'text-red-400' : 'text-text-dim'}`}>
               {formatDate(brief.due_date)}
             </span>
           )}
