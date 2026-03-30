@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
-import { CreativeCard, BriefStatus, AwarenessStage } from '@/lib/supabase'
+import { CreativeCard, BriefStatus, AwarenessStage, ScriptRow } from '@/lib/supabase'
 import { X, ExternalLink, Save, Trophy } from 'lucide-react'
+import ScriptTable from './ScriptTable'
 
 interface Props {
   card: CreativeCard
@@ -27,10 +28,16 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
     concept: brief.concept || '',
     offer: brief.offer || '',
     inspiration_url: brief.inspiration_url || '',
+    briefing_url: brief.briefing_url || '',
+    content_url: brief.content_url || '',
+    assignee: brief.assignee || '',
+    due_date: brief.due_date || '',
     script: brief.script || '',
+    script_rows: (brief.script_rows || []) as ScriptRow[],
     status: brief.status,
     awareness_stage: brief.awareness_stage,
   })
+  const [scriptTab, setScriptTab] = useState<'table' | 'legacy'>('table')
   const [saving, setSaving] = useState(false)
   const hasPerf = blended.spend > 0
 
@@ -169,16 +176,95 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
             </div>
           </label>
 
+          {/* Assignee + Due Date */}
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className={labelCls}>Assignee</span>
+              <input className={inputCls} placeholder="e.g. John Smith"
+                value={form.assignee}
+                onChange={e => setForm(f => ({ ...f, assignee: e.target.value }))}
+              />
+            </label>
+            <label className="block">
+              <span className={labelCls}>Due Date</span>
+              <input type="date" className={inputCls}
+                value={form.due_date}
+                onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))}
+              />
+            </label>
+          </div>
+
           <label className="block">
-            <span className={labelCls}>Script</span>
-            <textarea
-              className={`${inputCls} resize-none font-mono text-xs leading-relaxed`}
-              rows={10}
-              placeholder={"[HOOK - 0-3s]\nOpening line...\n\n[PROBLEM - 3-8s]\nPain point...\n\n[SOLUTION - 8-15s]\nProduct intro...\n\n[CTA - 20-25s]\nCall to action..."}
-              value={form.script}
-              onChange={e => setForm(f => ({ ...f, script: e.target.value }))}
-            />
+            <span className={labelCls}>Briefing Link</span>
+            <div className="flex gap-2">
+              <input className={`${inputCls} flex-1`} placeholder="https://notion.so/... or Google Doc"
+                value={form.briefing_url}
+                onChange={e => setForm(f => ({ ...f, briefing_url: e.target.value }))}
+              />
+              {form.briefing_url && (
+                <a href={form.briefing_url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center w-9 bg-bg border border-border rounded-lg text-text-dim hover:text-accent transition-colors">
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
           </label>
+
+          <label className="block">
+            <span className={labelCls}>Content Link</span>
+            <div className="flex gap-2">
+              <input className={`${inputCls} flex-1`} placeholder="https://drive.google.com/..."
+                value={form.content_url}
+                onChange={e => setForm(f => ({ ...f, content_url: e.target.value }))}
+              />
+              {form.content_url && (
+                <a href={form.content_url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center w-9 bg-bg border border-border rounded-lg text-text-dim hover:text-accent transition-colors">
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
+          </label>
+
+          {/* Script — multilingual table */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className={labelCls}>Script</span>
+              <div className="flex gap-1 bg-bg border border-border rounded-lg p-0.5">
+                <button
+                  onClick={() => setScriptTab('table')}
+                  className={`px-2.5 py-1 rounded text-xs font-display font-bold transition-colors ${
+                    scriptTab === 'table' ? 'bg-surface text-accent' : 'text-text-dim hover:text-text'
+                  }`}
+                >
+                  Table
+                </button>
+                <button
+                  onClick={() => setScriptTab('legacy')}
+                  className={`px-2.5 py-1 rounded text-xs font-display font-bold transition-colors ${
+                    scriptTab === 'legacy' ? 'bg-surface text-accent' : 'text-text-dim hover:text-text'
+                  }`}
+                >
+                  Plain text
+                </button>
+              </div>
+            </div>
+            {scriptTab === 'table' ? (
+              <ScriptTable
+                rows={form.script_rows}
+                markets={brief.markets}
+                onChange={rows => setForm(f => ({ ...f, script_rows: rows }))}
+              />
+            ) : (
+              <textarea
+                className={`${inputCls} resize-none font-mono text-xs leading-relaxed`}
+                rows={8}
+                placeholder={"[HOOK - 0-3s]\nOpening line...\n\n[PROBLEM - 3-8s]\nPain point...\n\n[CTA - 20-25s]\nCall to action..."}
+                value={form.script}
+                onChange={e => setForm(f => ({ ...f, script: e.target.value }))}
+              />
+            )}
+          </div>
         </div>
 
         {/* Save */}

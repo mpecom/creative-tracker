@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { X, ExternalLink } from 'lucide-react'
-import { Market, AwarenessStage } from '@/lib/supabase'
+import { Market, AwarenessStage, ScriptRow } from '@/lib/supabase'
+import ScriptTable from './ScriptTable'
 
 interface Props {
   onClose: () => void
@@ -25,6 +26,7 @@ export default function AddBriefModal({ onClose, onSaved }: Props) {
     offer: '',
     inspiration_url: '',
     script: '',
+    script_rows: [] as ScriptRow[],
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -203,16 +205,12 @@ export default function AddBriefModal({ onClose, onSaved }: Props) {
         ) : (
           /* Script tab */
           <div className="space-y-3">
-            <label className="block">
-              <span className={labelCls}>Ad Script</span>
-              <textarea
-                className={`${inputCls} resize-none font-mono text-xs leading-relaxed`}
-                rows={14}
-                placeholder={"[HOOK - 0-3s]\nOpening line that stops the scroll...\n\n[PROBLEM - 3-8s]\nDescribe the pain point...\n\n[SOLUTION - 8-15s]\nIntroduce the product...\n\n[SOCIAL PROOF - 15-20s]\nTestimonials, results...\n\n[CTA - 20-25s]\nCall to action with offer..."}
-                value={form.script}
-                onChange={e => setForm(f => ({ ...f, script: e.target.value }))}
-              />
-            </label>
+            <p className="text-text-dim text-xs">Add script lines with per-language translations. Language columns match your selected markets.</p>
+            <ScriptTable
+              rows={form.script_rows}
+              markets={form.markets}
+              onChange={rows => setForm(f => ({ ...f, script_rows: rows }))}
+            />
           </div>
         )}
 
