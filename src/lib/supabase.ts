@@ -7,7 +7,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 export type Market = 'NL' | 'FR' | 'DE' | 'ES' | 'IT'
 export type CampaignType = 'ABO' | 'CBO'
-export type AwarenessStage = 'top' | 'mid' | 'bottom'
+export type AwarenessStage = 'Unaware' | 'Problem Aware' | 'Solution Aware' | 'Product Aware' | 'Most Aware'
+export type BriefStatus = 'idea' | 'script' | 'production' | 'review' | 'ready' | 'live' | 'active'
 
 export interface Brief {
   id: string
@@ -17,7 +18,11 @@ export interface Brief {
   hook: string
   markets: Market[]
   awareness_stage: AwarenessStage
-  notes?: string
+  concept?: string        // creative concept description
+  offer?: string          // the offer / CTA
+  inspiration_url?: string
+  script?: string
+  status: BriefStatus
   created_at: string
 }
 
