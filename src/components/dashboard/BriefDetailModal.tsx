@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { CreativeCard, BriefStatus, AwarenessStage, ScriptRow } from '@/lib/supabase'
 import { X, ExternalLink, Save, Trophy } from 'lucide-react'
 import ScriptTable from './ScriptTable'
+import TrendChart from './TrendChart'
 
 interface Props {
   card: CreativeCard
@@ -84,25 +85,33 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
 
         {/* Performance stats (if active) */}
         {hasPerf && (
-          <div className="grid grid-cols-4 gap-3 mb-5 bg-bg rounded-xl p-3 border border-border">
-            <div>
-              <span className="text-text-dim text-xs">ROAS</span>
-              <p className={`font-display font-bold text-lg ${is_winner ? 'text-accent' : 'text-text'}`}>{blended.roas.toFixed(2)}x</p>
+          <div className="mb-5 bg-bg rounded-xl border border-border overflow-hidden">
+            <div className="grid grid-cols-4 gap-3 p-3 border-b border-border">
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">ROAS</span>
+                <p className={`font-display font-bold text-xl leading-tight mt-0.5 ${is_winner ? 'text-accent' : 'text-text'}`}>{blended.roas.toFixed(2)}x</p>
+              </div>
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">CPA</span>
+                <p className="font-display font-bold text-xl leading-tight mt-0.5 text-text">€{blended.cpa.toFixed(0)}</p>
+              </div>
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">Hook%</span>
+                <p className="font-display font-bold text-xl leading-tight mt-0.5 text-text">{(blended.thumbstop_rate * 100).toFixed(1)}%</p>
+              </div>
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">Spend</span>
+                <p className="font-display font-bold text-xl leading-tight mt-0.5 text-text">
+                  €{blended.spend >= 1000 ? `${(blended.spend / 1000).toFixed(1)}k` : blended.spend.toFixed(0)}
+                </p>
+              </div>
             </div>
-            <div>
-              <span className="text-text-dim text-xs">CPA</span>
-              <p className="font-display font-bold text-lg text-text">€{blended.cpa.toFixed(0)}</p>
-            </div>
-            <div>
-              <span className="text-text-dim text-xs">Hook%</span>
-              <p className="font-display font-bold text-lg text-text">{(blended.thumbstop_rate * 100).toFixed(1)}%</p>
-            </div>
-            <div>
-              <span className="text-text-dim text-xs">Spend</span>
-              <p className="font-display font-bold text-lg text-text">
-                €{blended.spend >= 1000 ? `${(blended.spend / 1000).toFixed(1)}k` : blended.spend.toFixed(0)}
-              </p>
-            </div>
+            {card.trend && card.trend.length >= 2 && (
+              <div className="px-3 pt-3 pb-2">
+                <p className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest mb-2">ROAS Trend</p>
+                <TrendChart data={card.trend} roasTarget={2.5} height={120} />
+              </div>
+            )}
           </div>
         )}
 
