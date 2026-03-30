@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useState, ComponentType } from 'react'
 import { BriefStatus, CreativeCard } from '@/lib/supabase'
 import {
   Lightbulb, FileText, Video, Eye, ArrowRight, Wifi, TrendingUp,
-  ChevronRight, ChevronLeft, GripVertical, ExternalLink, Tag
+  ChevronRight, ChevronLeft, ExternalLink, Tag, CalendarDays, Trophy, Link2
 } from 'lucide-react'
 
 interface Props {
@@ -12,20 +12,48 @@ interface Props {
   onCardClick: (card: CreativeCard) => void
 }
 
-const COLUMNS: { status: BriefStatus; label: string; icon: React.ElementType; color: string }[] = [
-  { status: 'idea',       label: 'Idea',       icon: Lightbulb,   color: 'text-yellow-400' },
-  { status: 'script',     label: 'Script',     icon: FileText,    color: 'text-blue-400' },
-  { status: 'production', label: 'Production', icon: Video,       color: 'text-purple-400' },
-  { status: 'review',     label: 'Review',     icon: Eye,         color: 'text-orange-400' },
-  { status: 'ready',      label: 'Ready',      icon: ArrowRight,  color: 'text-green-400' },
-  { status: 'live',       label: 'Live',       icon: Wifi,        color: 'text-cyan-400' },
-  { status: 'active',     label: 'Active',     icon: TrendingUp,  color: 'text-accent' },
+type Column = {
+  status: BriefStatus
+  label: string
+  icon: ComponentType<{ size?: number; className?: string }>
+  headerBg: string
+  headerBorder: string
+  headerText: string
+  dot: string
+}
+
+const COLUMNS: Column[] = [
+  { status: 'idea',       label: 'Idea',       icon: Lightbulb,  headerBg: 'bg-yellow-500/10', headerBorder: 'border-yellow-500/30', headerText: 'text-yellow-400', dot: 'bg-yellow-400' },
+  { status: 'script',     label: 'Script',     icon: FileText,   headerBg: 'bg-blue-500/10',   headerBorder: 'border-blue-500/30',   headerText: 'text-blue-400',   dot: 'bg-blue-400' },
+  { status: 'production', label: 'Production', icon: Video,      headerBg: 'bg-purple-500/10', headerBorder: 'border-purple-500/30', headerText: 'text-purple-400', dot: 'bg-purple-400' },
+  { status: 'review',     label: 'Review',     icon: Eye,        headerBg: 'bg-orange-500/10', headerBorder: 'border-orange-500/30', headerText: 'text-orange-400', dot: 'bg-orange-400' },
+  { status: 'ready',      label: 'Ready',      icon: ArrowRight, headerBg: 'bg-green-500/10',  headerBorder: 'border-green-500/30',  headerText: 'text-green-400',  dot: 'bg-green-400' },
+  { status: 'live',       label: 'Live',       icon: Wifi,       headerBg: 'bg-cyan-500/10',   headerBorder: 'border-cyan-500/30',   headerText: 'text-cyan-400',   dot: 'bg-cyan-400' },
+  { status: 'active',     label: 'Active',     icon: TrendingUp, headerBg: 'bg-accent/10',     headerBorder: 'border-accent/30',     headerText: 'text-accent',     dot: 'bg-accent' },
 ]
 
 const MARKET_FLAGS: Record<string, string> = { NL: '🇳🇱', FR: '🇫🇷', DE: '🇩🇪', ES: '🇪🇸', IT: '🇮🇹' }
 
-function KanbanCard({ card, onMove, onClick }: {
+function formatDate(iso?: string) {
+  if (!iso) return null
+  const d = new Date(iso)
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+}
+
+function AvatarInitials({ name }: { name: string }) {
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  const colors = ['bg-pink-500', 'bg-violet-500', 'bg-blue-500', 'bg-teal-500', 'bg-orange-500']
+  const color = colors[name.charCodeAt(0) % colors.length]
+  return (
+    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-xs font-bold flex-shrink-0 ${color}`}>
+      {initials}
+    </span>
+  )
+}
+
+function KanbanCard({ card, col, onMove, onClick }: {
   card: CreativeCard
+  col: Column
   onMove: (dir: 'left' | 'right') => void
   onClick: () => void
 }) {
@@ -35,98 +63,139 @@ function KanbanCard({ card, onMove, onClick }: {
   const canLeft = statusIdx > 0
   const canRight = statusIdx < COLUMNS.length - 1
 
+  const isOverdue = brief.due_date && new Date(brief.due_date) < new Date()
+
   return (
     <div
-      className={`bg-bg border rounded-xl p-3 space-y-2 cursor-pointer hover:border-accent/40 transition-all group ${
-        is_winner ? 'border-accent/40' : 'border-border'
+      className={`bg-surface border rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group ${
+        is_winner ? 'border-accent/40' : 'border-border hover:border-accent/20'
       }`}
       onClick={onClick}
     >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <GripVertical size={12} className="text-muted flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <span className="font-display font-bold text-accent text-xs">{brief.concept_id}</span>
-          <span className="text-muted text-xs bg-border px-1.5 py-0.5 rounded font-display font-bold uppercase tracking-wide flex-shrink-0">
+      {/* Colored top bar */}
+      <div className={`h-0.5 w-full ${col.dot}`} />
+
+      <div className="p-3 space-y-2.5">
+        {/* Title row */}
+        <div className="flex items-start justify-between gap-1">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className={`font-display font-bold text-xs ${col.headerText}`}>{brief.concept_id}</span>
+              {is_winner && <Trophy size={10} className="text-accent flex-shrink-0" />}
+            </div>
+            <p className="text-text text-sm font-display font-bold leading-tight truncate">{brief.angle}</p>
+          </div>
+          {/* Move arrows */}
+          <div className="flex gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
+            {canLeft && (
+              <button onClick={e => { e.stopPropagation(); onMove('left') }}
+                className="w-5 h-5 flex items-center justify-center rounded text-text-dim hover:text-text hover:bg-border transition-colors">
+                <ChevronLeft size={11} />
+              </button>
+            )}
+            {canRight && (
+              <button onClick={e => { e.stopPropagation(); onMove('right') }}
+                className="w-5 h-5 flex items-center justify-center rounded text-text-dim hover:text-text hover:bg-border transition-colors">
+                <ChevronRight size={11} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Hook */}
+        <p className="text-text-dim text-xs leading-snug line-clamp-2">{brief.hook}</p>
+
+        {/* Format + Awareness row */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-muted text-xs bg-border px-1.5 py-0.5 rounded font-display font-bold uppercase tracking-wide">
             {brief.format}
           </span>
-        </div>
-        {/* Move arrows */}
-        <div className="flex gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-          {canLeft && (
-            <button
-              onClick={e => { e.stopPropagation(); onMove('left') }}
-              className="w-5 h-5 flex items-center justify-center rounded text-text-dim hover:text-text hover:bg-border transition-colors"
-            >
-              <ChevronLeft size={12} />
-            </button>
-          )}
-          {canRight && (
-            <button
-              onClick={e => { e.stopPropagation(); onMove('right') }}
-              className="w-5 h-5 flex items-center justify-center rounded text-text-dim hover:text-text hover:bg-border transition-colors"
-            >
-              <ChevronRight size={12} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Angle + Hook */}
-      <div>
-        <p className="text-text text-sm font-display font-bold truncate">{brief.angle}</p>
-        <p className="text-text-dim text-xs truncate">{brief.hook}</p>
-      </div>
-
-      {/* Concept snippet */}
-      {brief.concept && (
-        <p className="text-muted text-xs line-clamp-2">{brief.concept}</p>
-      )}
-
-      {/* Tags row */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        {/* Markets */}
-        <div className="flex gap-0.5">
-          {brief.markets.slice(0, 3).map(m => (
-            <span key={m} className="text-xs">{MARKET_FLAGS[m]}</span>
-          ))}
-          {brief.markets.length > 3 && <span className="text-muted text-xs">+{brief.markets.length - 3}</span>}
-        </div>
-
-        {/* Indicators */}
-        {brief.script && (
-          <span className="flex items-center gap-0.5 text-muted text-xs" title="Has script">
-            <FileText size={10} />
+          <span className="text-muted text-xs bg-border px-1.5 py-0.5 rounded">
+            {brief.awareness_stage}
           </span>
-        )}
+        </div>
+
+        {/* Offer */}
         {brief.offer && (
-          <span className="flex items-center gap-0.5 text-muted text-xs" title={brief.offer}>
-            <Tag size={10} />
-          </span>
+          <div className="flex items-center gap-1.5">
+            <Tag size={10} className="text-text-dim flex-shrink-0" />
+            <span className="text-text-dim text-xs truncate">{brief.offer}</span>
+          </div>
         )}
-        {brief.inspiration_url && (
-          <a href={brief.inspiration_url} target="_blank" rel="noopener noreferrer"
-            onClick={e => e.stopPropagation()}
-            className="flex items-center gap-0.5 text-muted text-xs hover:text-accent transition-colors"
-            title="Inspiration"
-          >
-            <ExternalLink size={10} />
-          </a>
+
+        {/* Links row */}
+        {(brief.briefing_url || brief.content_url || brief.inspiration_url) && (
+          <div className="flex flex-col gap-1">
+            {brief.briefing_url && (
+              <a href={brief.briefing_url} target="_blank" rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors truncate"
+              >
+                <FileText size={10} className="flex-shrink-0" />
+                <span className="truncate">Brief doc</span>
+                <ExternalLink size={9} className="flex-shrink-0 ml-auto" />
+              </a>
+            )}
+            {brief.content_url && (
+              <a href={brief.content_url} target="_blank" rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors truncate"
+              >
+                <Link2 size={10} className="flex-shrink-0" />
+                <span className="truncate">Content file</span>
+                <ExternalLink size={9} className="flex-shrink-0 ml-auto" />
+              </a>
+            )}
+            {brief.inspiration_url && !brief.content_url && (
+              <a href={brief.inspiration_url} target="_blank" rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="flex items-center gap-1.5 text-xs text-text-dim hover:text-text transition-colors truncate"
+              >
+                <ExternalLink size={10} className="flex-shrink-0" />
+                <span className="truncate">Inspiration</span>
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* Footer: assignee + due date + markets */}
+        <div className="flex items-center justify-between pt-1 border-t border-border">
+          <div className="flex items-center gap-1.5">
+            {brief.assignee ? (
+              <AvatarInitials name={brief.assignee} />
+            ) : (
+              <span className="w-6 h-6 rounded-full border border-dashed border-border flex items-center justify-center">
+                <span className="text-muted text-xs">?</span>
+              </span>
+            )}
+            <div className="flex gap-0.5">
+              {brief.markets.slice(0, 2).map(m => (
+                <span key={m} className="text-xs">{MARKET_FLAGS[m]}</span>
+              ))}
+              {brief.markets.length > 2 && <span className="text-muted text-xs">+{brief.markets.length - 2}</span>}
+            </div>
+          </div>
+          {brief.due_date && (
+            <span className={`flex items-center gap-1 text-xs ${isOverdue ? 'text-red-400' : 'text-text-dim'}`}>
+              <CalendarDays size={10} />
+              {formatDate(brief.due_date)}
+            </span>
+          )}
+        </div>
+
+        {/* Performance mini-stats */}
+        {hasPerf && (
+          <div className="flex gap-3 pt-1 border-t border-border">
+            <span className={`text-xs font-display font-bold ${is_winner ? 'text-accent' : 'text-text'}`}>
+              {blended.roas.toFixed(2)}x
+            </span>
+            <span className="text-xs text-text-dim">€{blended.cpa.toFixed(0)} CPA</span>
+            <span className="text-xs text-muted">
+              €{blended.spend >= 1000 ? `${(blended.spend / 1000).toFixed(1)}k` : blended.spend.toFixed(0)}
+            </span>
+          </div>
         )}
       </div>
-
-      {/* Performance mini-stats (if active) */}
-      {hasPerf && (
-        <div className="flex gap-3 pt-1 border-t border-border">
-          <span className={`text-xs font-display font-bold ${is_winner ? 'text-accent' : 'text-text'}`}>
-            {blended.roas.toFixed(1)}x
-          </span>
-          <span className="text-xs text-text-dim">€{blended.cpa.toFixed(0)} CPA</span>
-          <span className="text-xs text-muted">
-            €{blended.spend >= 1000 ? `${(blended.spend / 1000).toFixed(1)}k` : blended.spend.toFixed(0)}
-          </span>
-        </div>
-      )}
     </div>
   )
 }
@@ -143,37 +212,37 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick }: Prop
   }
 
   return (
-    <div className="flex gap-3 overflow-x-auto pb-4 -mx-6 px-6">
+    <div className="flex gap-3 overflow-x-auto pb-6 -mx-6 px-6 min-h-[calc(100vh-180px)]">
       {COLUMNS.map(col => {
         const colCards = getCardsForStatus(col.status)
         return (
-          <div key={col.status} className="flex-shrink-0 w-64">
+          <div key={col.status} className="flex-shrink-0 w-72">
             {/* Column header */}
-            <div className="flex items-center gap-2 mb-3 px-1">
-              <col.icon size={14} className={col.color} />
-              <span className="text-text-dim text-xs font-display font-bold uppercase tracking-widest">
+            <div className={`flex items-center gap-2 mb-2 px-3 py-2 rounded-lg border ${col.headerBg} ${col.headerBorder}`}>
+              <col.icon size={13} className={col.headerText} />
+              <span className={`text-xs font-display font-bold uppercase tracking-widest ${col.headerText}`}>
                 {col.label}
               </span>
-              <span className="text-muted text-xs bg-border px-1.5 py-0.5 rounded-full font-display font-bold">
+              <span className="ml-auto text-xs bg-black/20 text-white/70 px-1.5 py-0.5 rounded-full font-display font-bold">
                 {colCards.length}
               </span>
             </div>
 
             {/* Cards */}
-            <div className="space-y-2 min-h-[120px] bg-surface/50 border border-border border-dashed rounded-xl p-2">
-              {colCards.length === 0 ? (
-                <div className="flex items-center justify-center h-20 text-muted text-xs">
-                  No items
+            <div className="space-y-2 min-h-[80px]">
+              {colCards.map(card => (
+                <KanbanCard
+                  key={card.brief.id}
+                  card={card}
+                  col={col}
+                  onMove={dir => moveCard(card.brief.id, card.brief.status, dir)}
+                  onClick={() => onCardClick(card)}
+                />
+              ))}
+              {colCards.length === 0 && (
+                <div className="border border-dashed border-border rounded-xl h-20 flex items-center justify-center text-muted text-xs">
+                  Drop here
                 </div>
-              ) : (
-                colCards.map(card => (
-                  <KanbanCard
-                    key={card.brief.id}
-                    card={card}
-                    onMove={dir => moveCard(card.brief.id, card.brief.status, dir)}
-                    onClick={() => onCardClick(card)}
-                  />
-                ))
               )}
             </div>
           </div>

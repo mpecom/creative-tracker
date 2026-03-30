@@ -23,6 +23,10 @@ export interface Brief {
   inspiration_url?: string
   script?: string
   status: BriefStatus
+  assignee?: string       // person responsible
+  due_date?: string       // ISO date string
+  content_url?: string    // link to actual creative file (Drive, etc.)
+  briefing_url?: string   // link to brief doc (Notion, Google Doc)
   created_at: string
 }
 

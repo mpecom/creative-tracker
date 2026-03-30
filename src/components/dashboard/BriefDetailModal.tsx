@@ -27,6 +27,10 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
     concept: brief.concept || '',
     offer: brief.offer || '',
     inspiration_url: brief.inspiration_url || '',
+    briefing_url: brief.briefing_url || '',
+    content_url: brief.content_url || '',
+    assignee: brief.assignee || '',
+    due_date: brief.due_date || '',
     script: brief.script || '',
     status: brief.status,
     awareness_stage: brief.awareness_stage,
@@ -135,6 +139,24 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
 
         {/* Editable fields */}
         <div className="space-y-4 mb-5">
+          {/* Assignee + Due Date row */}
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className={labelCls}>Assignee</span>
+              <input className={inputCls} placeholder="e.g. John Smith"
+                value={form.assignee}
+                onChange={e => setForm(f => ({ ...f, assignee: e.target.value }))}
+              />
+            </label>
+            <label className="block">
+              <span className={labelCls}>Due Date</span>
+              <input type="date" className={inputCls}
+                value={form.due_date}
+                onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))}
+              />
+            </label>
+          </div>
+
           <label className="block">
             <span className={labelCls}>Concept</span>
             <textarea className={`${inputCls} resize-none`} rows={2}
@@ -150,6 +172,38 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
               value={form.offer}
               onChange={e => setForm(f => ({ ...f, offer: e.target.value }))}
             />
+          </label>
+
+          <label className="block">
+            <span className={labelCls}>Briefing Link</span>
+            <div className="flex gap-2">
+              <input className={`${inputCls} flex-1`} placeholder="https://notion.so/... or Google Doc"
+                value={form.briefing_url}
+                onChange={e => setForm(f => ({ ...f, briefing_url: e.target.value }))}
+              />
+              {form.briefing_url && (
+                <a href={form.briefing_url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center w-9 bg-bg border border-border rounded-lg text-text-dim hover:text-accent transition-colors">
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
+          </label>
+
+          <label className="block">
+            <span className={labelCls}>Content Link</span>
+            <div className="flex gap-2">
+              <input className={`${inputCls} flex-1`} placeholder="https://drive.google.com/..."
+                value={form.content_url}
+                onChange={e => setForm(f => ({ ...f, content_url: e.target.value }))}
+              />
+              {form.content_url && (
+                <a href={form.content_url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center w-9 bg-bg border border-border rounded-lg text-text-dim hover:text-accent transition-colors">
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
           </label>
 
           <label className="block">
