@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Brief, BriefStatus, CreativeCard } from '@/lib/supabase'
 import {
   Lightbulb, FileText, Video, Eye, Rocket, Radio, TrendingUp,
-  ChevronRight, ChevronLeft, GripVertical, ExternalLink, ScrollText, Tag
+  ChevronRight, ChevronLeft, GripVertical, ExternalLink, FileText, Tag
 } from 'lucide-react'
 
 interface Props {
@@ -96,7 +96,7 @@ function KanbanCard({ card, onMove, onClick }: {
         {/* Indicators */}
         {brief.script && (
           <span className="flex items-center gap-0.5 text-muted text-xs" title="Has script">
-            <ScrollText size={10} />
+            <FileText size={10} />
           </span>
         )}
         {brief.offer && (

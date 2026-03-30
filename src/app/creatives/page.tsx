@@ -7,7 +7,7 @@ import BriefDetailModal from '@/components/dashboard/BriefDetailModal'
 import FilterBar from '@/components/dashboard/FilterBar'
 import AddBriefModal from '@/components/dashboard/AddBriefModal'
 import LinkAdModal from '@/components/dashboard/LinkAdModal'
-import { Plus, LayoutGrid, Kanban } from 'lucide-react'
+import { Plus, LayoutGrid, Columns } from 'lucide-react'
 
 type ViewMode = 'board' | 'grid'
 
@@ -85,7 +85,7 @@ export default function Creatives() {
                 }`}
                 title="Board view"
               >
-                <Kanban size={16} />
+                <Columns size={16} />
               </button>
               <button
                 onClick={() => setView('grid')}

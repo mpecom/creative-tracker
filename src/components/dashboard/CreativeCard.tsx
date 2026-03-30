@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { CreativeCard } from '@/lib/supabase'
-import { ChevronDown, ChevronUp, Link2, Trophy, AlertTriangle, ImageOff, ScrollText, Tag } from 'lucide-react'
+import { ChevronDown, ChevronUp, Link2, Trophy, AlertTriangle, ImageOff, FileText, Tag } from 'lucide-react'
 import { ROAS_TARGET } from '@/lib/aggregate'
 
 interface Props {
@@ -101,7 +101,7 @@ export default function CreativeCardComponent({ card, onLinkAd }: Props) {
                 <span key={m} className="text-xs text-muted">{MARKET_FLAGS[m] || m}</span>
               ))}
             </div>
-            {brief.script && <ScrollText size={10} className="text-muted" title="Has script" />}
+            {brief.script && <FileText size={10} className="text-muted" title="Has script" />}
             {brief.offer && <Tag size={10} className="text-muted" title={brief.offer} />}
           </div>
         </div>
