@@ -101,8 +101,8 @@ export default function CreativeCardComponent({ card, onLinkAd }: Props) {
                 <span key={m} className="text-xs text-muted">{MARKET_FLAGS[m] || m}</span>
               ))}
             </div>
-            {brief.script && <FileText size={10} className="text-muted" title="Has script" />}
-            {brief.offer && <Tag size={10} className="text-muted" title={brief.offer} />}
+            {brief.script && <FileText size={10} className="text-muted" />}
+            {brief.offer && <Tag size={10} className="text-muted" />}
           </div>
         </div>
       </div>
