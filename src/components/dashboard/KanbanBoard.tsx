@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react'
-import { Brief, BriefStatus, CreativeCard } from '@/lib/supabase'
+import { BriefStatus, CreativeCard } from '@/lib/supabase'
 import {
-  Lightbulb, FileText, Video, Eye, Rocket, Radio, TrendingUp,
-  ChevronRight, ChevronLeft, GripVertical, ExternalLink, FileText, Tag
+  Lightbulb, FileText, Video, Eye, ArrowRight, Wifi, TrendingUp,
+  ChevronRight, ChevronLeft, GripVertical, ExternalLink, Tag
 } from 'lucide-react'
 
 interface Props {
@@ -17,8 +17,8 @@ const COLUMNS: { status: BriefStatus; label: string; icon: React.ElementType; co
   { status: 'script',     label: 'Script',     icon: FileText,    color: 'text-blue-400' },
   { status: 'production', label: 'Production', icon: Video,       color: 'text-purple-400' },
   { status: 'review',     label: 'Review',     icon: Eye,         color: 'text-orange-400' },
-  { status: 'ready',      label: 'Ready',      icon: Rocket,      color: 'text-green-400' },
-  { status: 'live',       label: 'Live',       icon: Radio,       color: 'text-cyan-400' },
+  { status: 'ready',      label: 'Ready',      icon: ArrowRight,  color: 'text-green-400' },
+  { status: 'live',       label: 'Live',       icon: Wifi,        color: 'text-cyan-400' },
   { status: 'active',     label: 'Active',     icon: TrendingUp,  color: 'text-accent' },
 ]
 
