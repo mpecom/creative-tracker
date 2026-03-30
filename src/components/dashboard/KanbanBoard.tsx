@@ -15,7 +15,7 @@ interface Props {
 type Column = {
   status: BriefStatus
   label: string
-  icon: ComponentType<{ size?: number; className?: string }>
+  icon: ComponentType<{ size?: number | string; className?: string }>
   headerBg: string
   headerBorder: string
   headerText: string
