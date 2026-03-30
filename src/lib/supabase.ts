@@ -70,6 +70,12 @@ export interface AdPerformance {
   ctr: number
 }
 
+export interface TrendPoint {
+  date: string
+  roas: number
+  spend: number
+}
+
 // Aggregated view for display
 export interface CreativeCard {
   brief: Brief
@@ -88,4 +94,5 @@ export interface CreativeCard {
   }
   by_market: Partial<Record<Market, { roas: number; cpa: number; spend: number; is_outlier: boolean }>>
   is_winner: boolean
+  trend: TrendPoint[]
 }

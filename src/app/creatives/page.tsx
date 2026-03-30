@@ -7,6 +7,7 @@ import AddBriefModal from '@/components/dashboard/AddBriefModal'
 import LinkAdModal from '@/components/dashboard/LinkAdModal'
 import { Plus, Layers, ImageOff, Trophy, ChevronUp, ChevronDown } from 'lucide-react'
 import { ROAS_TARGET } from '@/lib/aggregate'
+import Sparkline from '@/components/dashboard/Sparkline'
 
 type ViewMode = 'board' | 'list'
 type SortKey = 'roas' | 'cpa' | 'spend' | 'hook' | 'date'
@@ -230,11 +231,12 @@ export default function Creatives() {
                   <div style={{ minWidth: '860px' }}>
                     {/* Header */}
                     <div className="grid items-center px-4 py-2.5 border-b border-border bg-bg/60"
-                      style={{ gridTemplateColumns: '32px 44px 1fr 76px 88px 80px 76px 68px 82px 104px' }}>
+                      style={{ gridTemplateColumns: '32px 44px 1fr 76px 72px 88px 80px 76px 68px 82px 104px' }}>
                       <span className="text-[11px] font-display font-bold text-muted uppercase">#</span>
                       <span />
                       <span className="text-[11px] font-display font-bold text-text-dim uppercase tracking-wider pl-1">Creative</span>
                       <span className="text-[11px] font-display font-bold text-text-dim uppercase tracking-wider">Fmt</span>
+                      <span className="text-[11px] font-display font-bold text-text-dim uppercase tracking-wider text-right">Trend</span>
                       <div className="flex justify-end">
                         <SortHeader label="ROAS" col="roas" sortBy={sortBy} sortDir={sortDir} onSort={handleSort} />
                       </div>
@@ -263,7 +265,7 @@ export default function Creatives() {
                           className={`grid items-center px-4 py-3 border-b border-border last:border-b-0 cursor-pointer transition-colors hover:bg-border/40 ${
                             is_winner ? 'border-l-2 border-l-accent' : 'border-l-2 border-l-transparent'
                           }`}
-                          style={{ gridTemplateColumns: '32px 44px 1fr 76px 88px 80px 76px 68px 82px 104px' }}>
+                          style={{ gridTemplateColumns: '32px 44px 1fr 76px 72px 88px 80px 76px 68px 82px 104px' }}>
 
                           {/* Rank */}
                           <span className={`text-xs font-display font-bold ${is_winner ? 'text-accent' : 'text-muted'}`}>
@@ -296,6 +298,13 @@ export default function Creatives() {
                             <span className="text-[10px] font-display font-bold text-muted bg-border px-1.5 py-0.5 rounded uppercase tracking-wider">
                               {brief.format}
                             </span>
+                          </div>
+
+                          {/* Sparkline */}
+                          <div className="flex justify-end items-center">
+                            {hasData && card.trend.length >= 2
+                              ? <Sparkline data={card.trend} width={64} height={22} />
+                              : <span className="text-muted text-xs">—</span>}
                           </div>
 
                           {/* ROAS */}
