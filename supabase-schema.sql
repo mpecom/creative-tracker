@@ -8,8 +8,12 @@ create table briefs (
   format text not null,              -- UGC, Static, Carousel, etc.
   hook text not null,
   markets text[] not null default '{}',
-  awareness_stage text not null default 'top',
-  notes text,
+  awareness_stage text not null default 'Unaware',  -- Unaware / Problem Aware / Solution Aware / Product Aware / Most Aware
+  concept text,                      -- creative concept description
+  offer text,                        -- the offer / CTA
+  inspiration_url text,              -- link to reference content
+  script text,                       -- full ad script
+  status text not null default 'idea',  -- idea / script / production / review / ready / live / active
   created_at timestamptz not null default now()
 );
 
