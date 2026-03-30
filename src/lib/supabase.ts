@@ -36,6 +36,10 @@ export interface Brief {
   script?: string         // legacy plain text
   script_rows?: ScriptRow[] // structured multilingual script table
   status: BriefStatus
+  assignee?: string
+  due_date?: string
+  content_url?: string
+  briefing_url?: string
   created_at: string
 }
 
