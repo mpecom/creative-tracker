@@ -67,12 +67,12 @@ export default function Dashboard() {
       <header className="border-b border-border sticky top-0 z-20 bg-bg/95 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="font-display font-bold text-xl text-text">Overview</h1>
+            <h1 className="font-display font-extrabold text-2xl text-text uppercase tracking-tight">Overview</h1>
             <p className="text-text-dim text-xs mt-0.5">Last 14 days · All markets</p>
           </div>
           <button
             onClick={() => setShowAddBrief(true)}
-            className="flex items-center gap-2 bg-accent text-bg px-4 py-2 rounded-lg text-sm font-display font-bold hover:bg-accent-dim transition-colors"
+            className="flex items-center gap-2 bg-cta text-white px-4 py-2 rounded-lg text-sm font-display font-bold hover:opacity-90 transition-opacity uppercase tracking-wide"
           >
             + New Brief
           </button>

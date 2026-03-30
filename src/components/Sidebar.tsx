@@ -5,10 +5,10 @@ import { LayoutDashboard, Film, BarChart2, Zap, Sun, Moon } from 'lucide-react'
 import { useTheme } from './ThemeProvider'
 
 const NAV = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
-  { href: '/creatives', icon: Film, label: 'Creatives' },
-  { href: '/analytics', icon: BarChart2, label: 'Analytics' },
-  { href: '/hooks', icon: Zap, label: 'Hooks' },
+  { href: '/dashboard',  icon: LayoutDashboard, label: 'Overview' },
+  { href: '/creatives',  icon: Film,             label: 'Creatives' },
+  { href: '/analytics',  icon: BarChart2,         label: 'Analytics' },
+  { href: '/hooks',      icon: Zap,               label: 'Hooks' },
 ]
 
 export default function Sidebar() {
@@ -19,14 +19,20 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-60 bg-surface border-r border-border flex flex-col z-30">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border">
-        <span className="font-display font-bold text-lg text-text tracking-tight">
-          Creative<span className="text-accent">Tracker</span>
-        </span>
-        <p className="text-text-dim text-xs mt-0.5">Meta Ads · NL FR DE ES IT</p>
+        <div className="flex items-center gap-2.5 mb-1">
+          <div className="bg-accent px-2.5 py-1 rounded-md">
+            <span className="font-display font-extrabold text-white italic text-lg tracking-tight leading-none">
+              BOXR
+            </span>
+          </div>
+        </div>
+        <p className="text-text-dim text-[10px] font-display font-bold uppercase tracking-[0.2em] mt-0.5">
+          Creative Tracker
+        </p>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
         {NAV.map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
           return (
@@ -35,26 +41,31 @@ export default function Sidebar() {
               href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-display font-bold transition-all ${
                 active
-                  ? 'bg-accent text-bg'
+                  ? 'bg-accent text-white'
                   : 'text-text-dim hover:text-text hover:bg-border'
               }`}
             >
-              <Icon size={16} />
+              <Icon size={15} />
               {label}
             </Link>
           )
         })}
       </nav>
 
-      {/* Bottom: theme toggle */}
-      <div className="px-3 py-4 border-t border-border">
+      {/* Bottom */}
+      <div className="px-3 py-4 border-t border-border space-y-1">
         <button
           onClick={toggle}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-display font-bold text-text-dim hover:text-text hover:bg-border transition-all"
         >
-          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
           {theme === 'dark' ? 'Light mode' : 'Dark mode'}
         </button>
+        <div className="px-3 pt-2">
+          <p className="text-muted text-[10px] font-display font-bold uppercase tracking-widest">
+            NL · FR · DE · ES · IT
+          </p>
+        </div>
       </div>
     </aside>
   )
