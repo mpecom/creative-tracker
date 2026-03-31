@@ -1,5 +1,5 @@
 'use client'
-import { useState, ComponentType } from 'react'
+import { useState, useRef, ComponentType } from 'react'
 import { BriefStatus, CreativeCard } from '@/lib/supabase'
 import {
   Lightbulb, FileText, Video, Eye, ArrowRight, Wifi, TrendingUp,
@@ -52,12 +52,13 @@ function AvatarInitials({ name }: { name: string }) {
   )
 }
 
-function KanbanCard({ card, col, onMove, onClick, onDelete }: {
+function KanbanCard({ card, col, onMove, onClick, onDelete, onDragStart }: {
   card: CreativeCard
   col: Column
   onMove: (dir: 'left' | 'right') => void
   onClick: () => void
   onDelete: () => void
+  onDragStart: (e: React.DragEvent) => void
 }) {
   const { brief, blended, is_winner, creative } = card
   const hasPerf = blended.spend > 0
@@ -76,7 +77,9 @@ function KanbanCard({ card, col, onMove, onClick, onDelete }: {
 
   return (
     <div
-      className={`bg-surface border rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group ${
+      draggable
+      onDragStart={onDragStart}
+      className={`bg-surface border rounded-xl overflow-hidden cursor-grab active:cursor-grabbing hover:shadow-md transition-all group ${
         is_winner ? 'border-accent/50 border-l-2 border-l-accent' : 'border-border hover:border-accent/20'
       }`}
       onClick={() => { setConfirming(false); onClick() }}
@@ -222,6 +225,9 @@ function KanbanCard({ card, col, onMove, onClick, onDelete }: {
 }
 
 export default function KanbanBoard({ cards, onStatusChange, onCardClick, onRefresh }: Props) {
+  const draggingId = useRef<string | null>(null)
+  const [dragOverCol, setDragOverCol] = useState<BriefStatus | null>(null)
+
   const getCardsForStatus = (status: BriefStatus) =>
     cards.filter(c => c.brief.status === status)
 
@@ -237,10 +243,20 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick, onRefr
     onRefresh()
   }
 
+  const handleDrop = (e: React.DragEvent, targetStatus: BriefStatus) => {
+    e.preventDefault()
+    if (draggingId.current) {
+      onStatusChange(draggingId.current, targetStatus)
+      draggingId.current = null
+    }
+    setDragOverCol(null)
+  }
+
   return (
     <div className="flex gap-3 overflow-x-auto pb-6 -mx-6 px-6 min-h-[calc(100vh-180px)]">
       {COLUMNS.map(col => {
         const colCards = getCardsForStatus(col.status)
+        const isOver = dragOverCol === col.status
         return (
           <div key={col.status} className="flex-shrink-0 w-72">
             {/* Column header */}
@@ -254,8 +270,19 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick, onRefr
               </span>
             </div>
 
-            {/* Cards */}
-            <div className="space-y-2 min-h-[80px]">
+            {/* Drop zone */}
+            <div
+              className={`space-y-2 min-h-[80px] rounded-xl border transition-colors p-1 ${
+                isOver
+                  ? 'border-accent bg-accent/5'
+                  : 'border-dashed border-border'
+              }`}
+              onDragOver={e => { e.preventDefault(); setDragOverCol(col.status) }}
+              onDragLeave={e => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverCol(null)
+              }}
+              onDrop={e => handleDrop(e, col.status)}
+            >
               {colCards.map(card => (
                 <KanbanCard
                   key={card.brief.id}
@@ -264,11 +291,17 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick, onRefr
                   onMove={dir => moveCard(card.brief.id, card.brief.status, dir)}
                   onClick={() => onCardClick(card)}
                   onDelete={() => deleteCard(card.brief.id)}
+                  onDragStart={e => {
+                    draggingId.current = card.brief.id
+                    e.dataTransfer.effectAllowed = 'move'
+                  }}
                 />
               ))}
               {colCards.length === 0 && (
-                <div className="border border-dashed border-border rounded-xl h-20 flex items-center justify-center text-muted text-xs font-display">
-                  Empty
+                <div className={`h-20 flex items-center justify-center text-xs rounded-lg transition-colors ${
+                  isOver ? 'text-accent' : 'text-muted'
+                }`}>
+                  {isOver ? 'Drop here' : 'Empty'}
                 </div>
               )}
             </div>
