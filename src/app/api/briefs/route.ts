@@ -12,7 +12,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { data, error } = await supabase.from('briefs').insert([body]).select().single()
+  const { data, error } = await supabase.from('briefs').insert([body]).select().maybeSingle()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data, { status: 201 })
 }
@@ -21,14 +21,12 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json()
   const { id, ...updates } = body
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('briefs')
     .update(updates)
     .eq('id', id)
-    .select()
-    .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  return NextResponse.json({ ok: true })
 }
 
 export async function DELETE(req: NextRequest) {
