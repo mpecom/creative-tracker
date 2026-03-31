@@ -19,14 +19,10 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-60 bg-surface border-r border-border flex flex-col z-30">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="bg-accent px-3 py-1.5 rounded">
-            <span className="font-display font-extrabold text-white text-xl tracking-widest leading-none">
-              BOXR
-            </span>
-          </div>
-        </div>
-        <p className="text-text-dim text-[9px] font-display font-bold uppercase tracking-[0.3em] mt-2">
+        <span className="font-display font-extrabold italic text-accent text-[2rem] tracking-tight leading-none">
+          BOXR
+        </span>
+        <p className="text-text-dim text-[9px] font-display font-bold uppercase tracking-[0.3em] mt-1.5">
           Creative Tracker
         </p>
       </div>
