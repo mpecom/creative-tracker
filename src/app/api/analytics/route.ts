@@ -130,9 +130,27 @@ export async function GET(req: NextRequest) {
     })).sort((a, b) => b.roas - a.roas)
   }
 
+  // Overall daily trend
+  const dailyByDate: Record<string, { spend: number; revenue: number; impressions: number }> = {}
+  for (const p of allPerfs) {
+    if (!dailyByDate[p.date]) dailyByDate[p.date] = { spend: 0, revenue: 0, impressions: 0 }
+    dailyByDate[p.date].spend += p.spend
+    dailyByDate[p.date].revenue += p.revenue
+    dailyByDate[p.date].impressions += p.impressions
+  }
+  const trend = Object.entries(dailyByDate)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, { spend, revenue, impressions }]) => ({
+      date,
+      roas: spend > 0 ? revenue / spend : 0,
+      spend,
+      impressions,
+    }))
+
   return NextResponse.json({
     by_format: finalize(byFormat),
     by_angle: finalize(byAngle),
     by_country: finalize(byCountry),
+    trend,
   })
 }

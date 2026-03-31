@@ -3,13 +3,14 @@ import { useState, ComponentType } from 'react'
 import { BriefStatus, CreativeCard } from '@/lib/supabase'
 import {
   Lightbulb, FileText, Video, Eye, ArrowRight, Wifi, TrendingUp,
-  ChevronRight, ChevronLeft, ExternalLink, Tag, Trophy, Link2
+  ChevronRight, ChevronLeft, ExternalLink, Tag, Trophy, Link2, Trash2,
 } from 'lucide-react'
 
 interface Props {
   cards: CreativeCard[]
   onStatusChange: (briefId: string, newStatus: BriefStatus) => void
   onCardClick: (card: CreativeCard) => void
+  onRefresh: () => void
 }
 
 type Column = {
@@ -51,26 +52,35 @@ function AvatarInitials({ name }: { name: string }) {
   )
 }
 
-function KanbanCard({ card, col, onMove, onClick }: {
+function KanbanCard({ card, col, onMove, onClick, onDelete }: {
   card: CreativeCard
   col: Column
   onMove: (dir: 'left' | 'right') => void
   onClick: () => void
+  onDelete: () => void
 }) {
-  const { brief, blended, is_winner } = card
+  const { brief, blended, is_winner, creative } = card
   const hasPerf = blended.spend > 0
+  const isLinked = !!creative
   const statusIdx = COLUMNS.findIndex(c => c.status === brief.status)
   const canLeft = statusIdx > 0
   const canRight = statusIdx < COLUMNS.length - 1
-
+  const [confirming, setConfirming] = useState(false)
   const isOverdue = brief.due_date && new Date(brief.due_date) < new Date()
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!confirming) { setConfirming(true); return }
+    onDelete()
+  }
 
   return (
     <div
       className={`bg-surface border rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-all group ${
-        is_winner ? 'border-accent/40' : 'border-border hover:border-accent/20'
+        is_winner ? 'border-accent/50 border-l-2 border-l-accent' : 'border-border hover:border-accent/20'
       }`}
-      onClick={onClick}
+      onClick={() => { setConfirming(false); onClick() }}
+      onMouseLeave={() => setConfirming(false)}
     >
       {/* Colored top bar */}
       <div className={`h-0.5 w-full ${col.dot}`} />
@@ -80,13 +90,25 @@ function KanbanCard({ card, col, onMove, onClick }: {
         <div className="flex items-start justify-between gap-1">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5">
-              <span className={`font-display font-bold text-xs ${col.headerText}`}>{brief.concept_id}</span>
+              <span className={`font-display font-extrabold text-xs ${col.headerText}`}>{brief.concept_id}</span>
               {is_winner && <Trophy size={10} className="text-accent flex-shrink-0" />}
             </div>
             <p className="text-text text-sm font-display font-bold leading-tight truncate">{brief.angle}</p>
           </div>
-          {/* Move arrows */}
-          <div className="flex gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
+          {/* Controls: delete + move arrows */}
+          <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
+            {!isLinked && (
+              <button
+                onClick={handleDelete}
+                className={`h-5 flex items-center justify-center rounded px-1.5 text-xs transition-colors ${
+                  confirming
+                    ? 'bg-loser text-white font-display font-bold'
+                    : 'text-muted hover:text-loser hover:bg-border'
+                }`}
+              >
+                {confirming ? 'Sure?' : <Trash2 size={11} />}
+              </button>
+            )}
             {canLeft && (
               <button onClick={e => { e.stopPropagation(); onMove('left') }}
                 className="w-5 h-5 flex items-center justify-center rounded text-text-dim hover:text-text hover:bg-border transition-colors">
@@ -176,7 +198,7 @@ function KanbanCard({ card, col, onMove, onClick }: {
             </div>
           </div>
           {brief.due_date && (
-            <span className={`text-xs ${isOverdue ? 'text-red-400' : 'text-text-dim'}`}>
+            <span className={`text-xs font-display font-bold ${isOverdue ? 'text-loser' : 'text-text-dim'}`}>
               {formatDate(brief.due_date)}
             </span>
           )}
@@ -185,11 +207,11 @@ function KanbanCard({ card, col, onMove, onClick }: {
         {/* Performance mini-stats */}
         {hasPerf && (
           <div className="flex gap-3 pt-1 border-t border-border">
-            <span className={`text-xs font-display font-bold ${is_winner ? 'text-accent' : 'text-text'}`}>
+            <span className={`text-xs font-display font-bold tabular-nums ${is_winner ? 'text-accent' : 'text-text'}`}>
               {blended.roas.toFixed(2)}x
             </span>
-            <span className="text-xs text-text-dim">€{blended.cpa.toFixed(0)} CPA</span>
-            <span className="text-xs text-muted">
+            <span className="text-xs text-text-dim tabular-nums">€{blended.cpa.toFixed(0)} CPA</span>
+            <span className="text-xs text-muted tabular-nums">
               €{blended.spend >= 1000 ? `${(blended.spend / 1000).toFixed(1)}k` : blended.spend.toFixed(0)}
             </span>
           </div>
@@ -199,7 +221,7 @@ function KanbanCard({ card, col, onMove, onClick }: {
   )
 }
 
-export default function KanbanBoard({ cards, onStatusChange, onCardClick }: Props) {
+export default function KanbanBoard({ cards, onStatusChange, onCardClick, onRefresh }: Props) {
   const getCardsForStatus = (status: BriefStatus) =>
     cards.filter(c => c.brief.status === status)
 
@@ -208,6 +230,11 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick }: Prop
     const newIdx = dir === 'right' ? idx + 1 : idx - 1
     if (newIdx < 0 || newIdx >= COLUMNS.length) return
     onStatusChange(briefId, COLUMNS[newIdx].status)
+  }
+
+  const deleteCard = async (briefId: string) => {
+    await fetch(`/api/briefs?id=${briefId}`, { method: 'DELETE' })
+    onRefresh()
   }
 
   return (
@@ -219,7 +246,7 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick }: Prop
             {/* Column header */}
             <div className={`flex items-center gap-2 mb-2 px-3 py-2 rounded-lg border ${col.headerBg} ${col.headerBorder}`}>
               <col.icon size={13} className={col.headerText} />
-              <span className={`text-xs font-display font-bold uppercase tracking-widest ${col.headerText}`}>
+              <span className={`text-xs font-display font-extrabold uppercase tracking-widest ${col.headerText}`}>
                 {col.label}
               </span>
               <span className="ml-auto text-xs bg-black/20 text-white/70 px-1.5 py-0.5 rounded-full font-display font-bold">
@@ -236,11 +263,12 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick }: Prop
                   col={col}
                   onMove={dir => moveCard(card.brief.id, card.brief.status, dir)}
                   onClick={() => onCardClick(card)}
+                  onDelete={() => deleteCard(card.brief.id)}
                 />
               ))}
               {colCards.length === 0 && (
-                <div className="border border-dashed border-border rounded-xl h-20 flex items-center justify-center text-muted text-xs">
-                  Drop here
+                <div className="border border-dashed border-border rounded-xl h-20 flex items-center justify-center text-muted text-xs font-display">
+                  Empty
                 </div>
               )}
             </div>

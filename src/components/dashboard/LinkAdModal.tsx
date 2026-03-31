@@ -82,7 +82,7 @@ export default function LinkAdModal({ briefId, onClose, onSaved }: Props) {
                   onClick={() => setForm(f => ({ ...f, market: m }))}
                   className={`px-3 py-1.5 rounded-lg text-sm font-display font-bold border transition-colors ${
                     form.market === m
-                      ? 'bg-accent text-bg border-accent'
+                      ? 'bg-accent text-white border-accent'
                       : 'bg-bg border-border text-text-dim hover:text-text'
                   }`}
                 >
@@ -113,7 +113,7 @@ export default function LinkAdModal({ briefId, onClose, onSaved }: Props) {
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="flex-1 px-4 py-2 rounded-lg bg-accent text-bg text-sm font-display font-bold hover:bg-accent-dim transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-2 rounded-lg bg-accent text-white text-sm font-display font-bold hover:bg-accent-dim transition-colors disabled:opacity-50"
           >
             {saving ? 'Linking…' : 'Link Ad'}
           </button>

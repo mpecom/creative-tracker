@@ -25,6 +25,7 @@ export function aggregateCreativeCard(
       by_campaign: {},
       by_market: {},
       is_winner: false,
+      trend: [],
     }
   }
 
@@ -89,6 +90,7 @@ export function aggregateCreativeCard(
     by_campaign: byCampaign,
     by_market: byMarket,
     is_winner: blendedRoas >= ROAS_TARGET,
+    trend: [],
   }
 }
 

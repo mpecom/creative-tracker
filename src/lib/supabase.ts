@@ -10,6 +10,18 @@ export type CampaignType = 'ABO' | 'CBO'
 export type AwarenessStage = 'Unaware' | 'Problem Aware' | 'Solution Aware' | 'Product Aware' | 'Most Aware'
 export type BriefStatus = 'idea' | 'script' | 'production' | 'review' | 'ready' | 'live' | 'active'
 
+export interface ScriptRow {
+  id: string
+  proofreader?: string   // proofreader instructions
+  editor?: string        // editor instructions
+  script: string         // main script line
+  NL?: string
+  FR?: string
+  DE?: string
+  ES?: string
+  IT?: string
+}
+
 export interface Brief {
   id: string
   concept_id: string      // e.g. C001
@@ -21,12 +33,13 @@ export interface Brief {
   concept?: string        // creative concept description
   offer?: string          // the offer / CTA
   inspiration_url?: string
-  script?: string
+  script?: string         // legacy plain text
+  script_rows?: ScriptRow[] // structured multilingual script table
   status: BriefStatus
-  assignee?: string       // person responsible
-  due_date?: string       // ISO date string
-  content_url?: string    // link to actual creative file (Drive, etc.)
-  briefing_url?: string   // link to brief doc (Notion, Google Doc)
+  assignee?: string
+  due_date?: string
+  content_url?: string
+  briefing_url?: string
   created_at: string
 }
 
@@ -57,6 +70,12 @@ export interface AdPerformance {
   ctr: number
 }
 
+export interface TrendPoint {
+  date: string
+  roas: number
+  spend: number
+}
+
 // Aggregated view for display
 export interface CreativeCard {
   brief: Brief
@@ -75,4 +94,5 @@ export interface CreativeCard {
   }
   by_market: Partial<Record<Market, { roas: number; cpa: number; spend: number; is_outlier: boolean }>>
   is_winner: boolean
+  trend: TrendPoint[]
 }

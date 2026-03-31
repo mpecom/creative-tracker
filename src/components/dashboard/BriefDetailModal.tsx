@@ -1,7 +1,9 @@
 'use client'
 import { useState } from 'react'
-import { CreativeCard, BriefStatus, AwarenessStage } from '@/lib/supabase'
+import { CreativeCard, BriefStatus, AwarenessStage, ScriptRow } from '@/lib/supabase'
 import { X, ExternalLink, Save, Trophy } from 'lucide-react'
+import ScriptTable from './ScriptTable'
+import TrendChart from './TrendChart'
 
 interface Props {
   card: CreativeCard
@@ -32,9 +34,11 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
     assignee: brief.assignee || '',
     due_date: brief.due_date || '',
     script: brief.script || '',
+    script_rows: (brief.script_rows || []) as ScriptRow[],
     status: brief.status,
     awareness_stage: brief.awareness_stage,
   })
+  const [scriptTab, setScriptTab] = useState<'table' | 'legacy'>('table')
   const [saving, setSaving] = useState(false)
   const hasPerf = blended.spend > 0
 
@@ -81,25 +85,33 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
 
         {/* Performance stats (if active) */}
         {hasPerf && (
-          <div className="grid grid-cols-4 gap-3 mb-5 bg-bg rounded-xl p-3 border border-border">
-            <div>
-              <span className="text-text-dim text-xs">ROAS</span>
-              <p className={`font-display font-bold text-lg ${is_winner ? 'text-accent' : 'text-text'}`}>{blended.roas.toFixed(2)}x</p>
+          <div className="mb-5 bg-bg rounded-xl border border-border overflow-hidden">
+            <div className="grid grid-cols-4 gap-3 p-3 border-b border-border">
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">ROAS</span>
+                <p className={`font-display font-bold text-xl leading-tight mt-0.5 ${is_winner ? 'text-accent' : 'text-text'}`}>{blended.roas.toFixed(2)}x</p>
+              </div>
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">CPA</span>
+                <p className="font-display font-bold text-xl leading-tight mt-0.5 text-text">€{blended.cpa.toFixed(0)}</p>
+              </div>
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">Hook%</span>
+                <p className="font-display font-bold text-xl leading-tight mt-0.5 text-text">{(blended.thumbstop_rate * 100).toFixed(1)}%</p>
+              </div>
+              <div>
+                <span className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest">Spend</span>
+                <p className="font-display font-bold text-xl leading-tight mt-0.5 text-text">
+                  €{blended.spend >= 1000 ? `${(blended.spend / 1000).toFixed(1)}k` : blended.spend.toFixed(0)}
+                </p>
+              </div>
             </div>
-            <div>
-              <span className="text-text-dim text-xs">CPA</span>
-              <p className="font-display font-bold text-lg text-text">€{blended.cpa.toFixed(0)}</p>
-            </div>
-            <div>
-              <span className="text-text-dim text-xs">Hook%</span>
-              <p className="font-display font-bold text-lg text-text">{(blended.thumbstop_rate * 100).toFixed(1)}%</p>
-            </div>
-            <div>
-              <span className="text-text-dim text-xs">Spend</span>
-              <p className="font-display font-bold text-lg text-text">
-                €{blended.spend >= 1000 ? `${(blended.spend / 1000).toFixed(1)}k` : blended.spend.toFixed(0)}
-              </p>
-            </div>
+            {card.trend && card.trend.length >= 2 && (
+              <div className="px-3 pt-3 pb-2">
+                <p className="text-text-dim text-[11px] font-display font-bold uppercase tracking-widest mb-2">ROAS Trend</p>
+                <TrendChart data={card.trend} roasTarget={2.5} height={120} />
+              </div>
+            )}
           </div>
         )}
 
@@ -127,7 +139,7 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
               <button key={s} onClick={() => setForm(f => ({ ...f, awareness_stage: s }))}
                 className={`px-3 py-1.5 rounded-lg text-xs font-display font-bold border transition-colors ${
                   form.awareness_stage === s
-                    ? 'bg-accent text-bg border-accent'
+                    ? 'bg-accent text-white border-accent'
                     : 'bg-bg border-border text-text-dim hover:text-text'
                 }`}
               >
@@ -223,16 +235,95 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
             </div>
           </label>
 
+          {/* Assignee + Due Date */}
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className={labelCls}>Assignee</span>
+              <input className={inputCls} placeholder="e.g. John Smith"
+                value={form.assignee}
+                onChange={e => setForm(f => ({ ...f, assignee: e.target.value }))}
+              />
+            </label>
+            <label className="block">
+              <span className={labelCls}>Due Date</span>
+              <input type="date" className={inputCls}
+                value={form.due_date}
+                onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))}
+              />
+            </label>
+          </div>
+
           <label className="block">
-            <span className={labelCls}>Script</span>
-            <textarea
-              className={`${inputCls} resize-none font-mono text-xs leading-relaxed`}
-              rows={10}
-              placeholder={"[HOOK - 0-3s]\nOpening line...\n\n[PROBLEM - 3-8s]\nPain point...\n\n[SOLUTION - 8-15s]\nProduct intro...\n\n[CTA - 20-25s]\nCall to action..."}
-              value={form.script}
-              onChange={e => setForm(f => ({ ...f, script: e.target.value }))}
-            />
+            <span className={labelCls}>Briefing Link</span>
+            <div className="flex gap-2">
+              <input className={`${inputCls} flex-1`} placeholder="https://notion.so/... or Google Doc"
+                value={form.briefing_url}
+                onChange={e => setForm(f => ({ ...f, briefing_url: e.target.value }))}
+              />
+              {form.briefing_url && (
+                <a href={form.briefing_url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center w-9 bg-bg border border-border rounded-lg text-text-dim hover:text-accent transition-colors">
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
           </label>
+
+          <label className="block">
+            <span className={labelCls}>Content Link</span>
+            <div className="flex gap-2">
+              <input className={`${inputCls} flex-1`} placeholder="https://drive.google.com/..."
+                value={form.content_url}
+                onChange={e => setForm(f => ({ ...f, content_url: e.target.value }))}
+              />
+              {form.content_url && (
+                <a href={form.content_url} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center w-9 bg-bg border border-border rounded-lg text-text-dim hover:text-accent transition-colors">
+                  <ExternalLink size={14} />
+                </a>
+              )}
+            </div>
+          </label>
+
+          {/* Script — multilingual table */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className={labelCls}>Script</span>
+              <div className="flex gap-1 bg-bg border border-border rounded-lg p-0.5">
+                <button
+                  onClick={() => setScriptTab('table')}
+                  className={`px-2.5 py-1 rounded text-xs font-display font-bold transition-colors ${
+                    scriptTab === 'table' ? 'bg-surface text-accent' : 'text-text-dim hover:text-text'
+                  }`}
+                >
+                  Table
+                </button>
+                <button
+                  onClick={() => setScriptTab('legacy')}
+                  className={`px-2.5 py-1 rounded text-xs font-display font-bold transition-colors ${
+                    scriptTab === 'legacy' ? 'bg-surface text-accent' : 'text-text-dim hover:text-text'
+                  }`}
+                >
+                  Plain text
+                </button>
+              </div>
+            </div>
+            {scriptTab === 'table' ? (
+              <ScriptTable
+                rows={form.script_rows}
+                markets={brief.markets}
+                onChange={rows => setForm(f => ({ ...f, script_rows: rows }))}
+              />
+            ) : (
+              <textarea
+                className={`${inputCls} resize-none font-mono text-xs leading-relaxed`}
+                rows={8}
+                placeholder={"[HOOK - 0-3s]\nOpening line...\n\n[PROBLEM - 3-8s]\nPain point...\n\n[CTA - 20-25s]\nCall to action..."}
+                value={form.script}
+                onChange={e => setForm(f => ({ ...f, script: e.target.value }))}
+              />
+            )}
+          </div>
         </div>
 
         {/* Save */}
@@ -243,7 +334,7 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
             Cancel
           </button>
           <button onClick={handleSave} disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-accent text-bg text-sm font-display font-bold hover:bg-accent-dim transition-colors disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-display font-bold hover:bg-accent-dim transition-colors disabled:opacity-50"
           >
             <Save size={14} />
             {saving ? 'Saving…' : 'Save Changes'}
