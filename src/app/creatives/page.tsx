@@ -174,7 +174,7 @@ export default function Creatives() {
               ))}
             </div>
           ) : (
-            <KanbanBoard cards={cards} onStatusChange={handleStatusChange} onCardClick={setDetailCard} />
+            <KanbanBoard cards={cards} onStatusChange={handleStatusChange} onCardClick={setDetailCard} onRefresh={fetchData} />
           )
         )}
 
