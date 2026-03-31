@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin as supabase } from '@/lib/supabase'
 
 // n8n posts to this endpoint with Meta ad performance data.
 // Protect with a shared secret set in n8n workflow headers.
