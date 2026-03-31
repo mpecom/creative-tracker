@@ -28,7 +28,11 @@ export async function PATCH(req: NextRequest) {
     .select('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!data || data.length === 0) {
-    return NextResponse.json({ error: 'Update blocked — check RLS policies or row ID' }, { status: 403 })
+    // Debug: check if the row actually exists
+    const { data: existing } = await supabase.from('briefs').select('id').eq('id', id).maybeSingle()
+    return NextResponse.json({
+      error: `Update matched 0 rows. id="${id}" exists=${!!existing}`
+    }, { status: 403 })
   }
   return NextResponse.json({ ok: true })
 }
