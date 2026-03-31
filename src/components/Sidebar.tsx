@@ -19,10 +19,8 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-60 bg-surface border-r border-border flex flex-col z-30">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border">
-        <span className="font-display font-extrabold italic text-accent text-[2rem] tracking-tight leading-none">
-          BOXR
-        </span>
-        <p className="text-text-dim text-[9px] font-display font-bold uppercase tracking-[0.3em] mt-1.5">
+        <img src="/nav-logo-blue.svg" alt="BOXR" className="h-8 w-auto" />
+        <p className="text-text-dim text-[9px] font-display font-bold uppercase tracking-[0.3em] mt-2">
           Creative Tracker
         </p>
       </div>
