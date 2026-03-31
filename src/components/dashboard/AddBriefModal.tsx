@@ -51,7 +51,11 @@ export default function AddBriefModal({ onClose, onSaved }: Props) {
       body: JSON.stringify({ ...form, status: 'idea' }),
     })
     if (res.ok) { onSaved(); onClose() }
-    else { setError('Failed to save. Check Supabase connection.'); setSaving(false) }
+    else {
+      const data = await res.json().catch(() => ({}))
+      setError(data.error || `Save failed (${res.status})`)
+      setSaving(false)
+    }
   }
 
   const inputCls = "mt-1 w-full bg-bg border border-border rounded-lg px-3 py-2 text-text text-sm outline-none focus:border-accent/50 transition-colors"

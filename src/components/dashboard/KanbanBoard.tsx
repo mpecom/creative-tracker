@@ -67,6 +67,7 @@ function KanbanCard({ card, col, onMove, onClick, onDelete, onDragStart }: {
   const canLeft = statusIdx > 0
   const canRight = statusIdx < COLUMNS.length - 1
   const [confirming, setConfirming] = useState(false)
+  const hasDragged = useRef(false)
   const isOverdue = brief.due_date && new Date(brief.due_date) < new Date()
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -78,17 +79,21 @@ function KanbanCard({ card, col, onMove, onClick, onDelete, onDragStart }: {
   return (
     <div
       draggable
-      onDragStart={onDragStart}
+      onDragStart={e => { hasDragged.current = true; onDragStart(e) }}
+      onDragEnd={() => { /* hasDragged stays true until click fires and resets */ }}
       className={`bg-surface border rounded-xl overflow-hidden cursor-grab active:cursor-grabbing hover:shadow-md transition-all group ${
         is_winner ? 'border-accent/50 border-l-2 border-l-accent' : 'border-border hover:border-accent/20'
       }`}
-      onClick={() => { setConfirming(false); onClick() }}
+      onClick={() => {
+        if (hasDragged.current) { hasDragged.current = false; return }
+        setConfirming(false); onClick()
+      }}
       onMouseLeave={() => setConfirming(false)}
     >
       {/* Colored top bar */}
-      <div className={`h-0.5 w-full ${col.dot}`} />
+      <div className={`h-1 w-full ${col.dot}`} />
 
-      <div className="p-3 space-y-2.5">
+      <div className="p-3 space-y-2">
         {/* Title row */}
         <div className="flex items-start justify-between gap-1">
           <div className="min-w-0">
@@ -128,7 +133,7 @@ function KanbanCard({ card, col, onMove, onClick, onDelete, onDragStart }: {
         </div>
 
         {/* Hook */}
-        <p className="text-text-dim text-xs leading-snug line-clamp-2 font-body">{brief.hook}</p>
+        <p className="text-text-dim text-xs leading-snug line-clamp-1 font-body">{brief.hook}</p>
 
         {/* Format + Awareness row */}
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -183,25 +188,19 @@ function KanbanCard({ card, col, onMove, onClick, onDelete, onDragStart }: {
           </div>
         )}
 
-        {/* Footer: assignee + due date + markets */}
+        {/* Footer: assignee + markets + due date */}
         <div className="flex items-center justify-between pt-1 border-t border-border">
           <div className="flex items-center gap-1.5">
-            {brief.assignee ? (
-              <AvatarInitials name={brief.assignee} />
-            ) : (
-              <span className="w-6 h-6 rounded-full border border-dashed border-border flex items-center justify-center">
-                <span className="text-muted text-xs">?</span>
-              </span>
-            )}
+            {brief.assignee && <AvatarInitials name={brief.assignee} />}
             <div className="flex gap-0.5">
-              {brief.markets.slice(0, 2).map(m => (
+              {brief.markets.slice(0, 3).map(m => (
                 <span key={m} className="text-xs">{MARKET_FLAGS[m]}</span>
               ))}
-              {brief.markets.length > 2 && <span className="text-muted text-xs">+{brief.markets.length - 2}</span>}
+              {brief.markets.length > 3 && <span className="text-muted text-xs">+{brief.markets.length - 3}</span>}
             </div>
           </div>
           {brief.due_date && (
-            <span className={`text-xs font-display font-bold ${isOverdue ? 'text-loser' : 'text-text-dim'}`}>
+            <span className={`text-xs font-medium ${isOverdue ? 'text-loser' : 'text-text-dim'}`}>
               {formatDate(brief.due_date)}
             </span>
           )}

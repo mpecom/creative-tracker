@@ -40,17 +40,23 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
   })
   const [scriptTab, setScriptTab] = useState<'table' | 'legacy'>('table')
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const hasPerf = blended.spend > 0
 
   const handleSave = async () => {
     setSaving(true)
+    setSaveError('')
     const res = await fetch('/api/briefs', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: brief.id, ...form }),
     })
     if (res.ok) { onSaved(); onClose() }
-    else setSaving(false)
+    else {
+      const data = await res.json().catch(() => ({}))
+      setSaveError(data.error || `Save failed (${res.status})`)
+      setSaving(false)
+    }
   }
 
   const inputCls = "w-full bg-bg border border-border rounded-lg px-3 py-2 text-text text-sm outline-none focus:border-accent/50 transition-colors"
@@ -327,6 +333,9 @@ export default function BriefDetailModal({ card, onClose, onSaved }: Props) {
         </div>
 
         {/* Save */}
+        {saveError && (
+          <p className="text-loser text-sm bg-loser/10 border border-loser/20 rounded-lg px-3 py-2">{saveError}</p>
+        )}
         <div className="flex gap-3">
           <button onClick={onClose}
             className="flex-1 px-4 py-2 rounded-lg border border-border text-text-dim hover:text-text text-sm font-display font-bold transition-colors"
