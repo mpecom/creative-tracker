@@ -7,8 +7,8 @@ import Sidebar from '@/components/Sidebar'
 const barlow = Barlow_Condensed({
   subsets: ['latin'],
   variable: '--font-display',
-  weight: ['500', '600', '700', '800'],
-  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700', '800'],
+  style: ['normal'],
 })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-body', weight: ['400', '500'] })
 
