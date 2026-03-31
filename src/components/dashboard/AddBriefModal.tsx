@@ -55,7 +55,7 @@ export default function AddBriefModal({ onClose, onSaved }: Props) {
   }
 
   const inputCls = "mt-1 w-full bg-bg border border-border rounded-lg px-3 py-2 text-text text-sm outline-none focus:border-accent/50 transition-colors"
-  const labelCls = "text-text-dim text-xs font-display font-bold uppercase tracking-wide"
+  const labelCls = "text-text-dim text-xs font-medium uppercase tracking-wide"
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">

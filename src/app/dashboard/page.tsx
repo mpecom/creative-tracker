@@ -147,7 +147,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-3">
                     <span className="font-display font-bold text-accent text-sm">{card.brief.concept_id}</span>
                     <div>
-                      <p className="text-text text-sm font-display font-bold">{card.brief.angle}</p>
+                      <p className="text-text text-sm font-medium">{card.brief.angle}</p>
                       <p className="text-text-dim text-xs">{card.brief.format} · {card.brief.hook.slice(0, 50)}{card.brief.hook.length > 50 ? '…' : ''}</p>
                     </div>
                   </div>

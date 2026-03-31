@@ -125,14 +125,14 @@ function KanbanCard({ card, col, onMove, onClick, onDelete }: {
         </div>
 
         {/* Hook */}
-        <p className="text-text-dim text-xs leading-snug line-clamp-2">{brief.hook}</p>
+        <p className="text-text-dim text-xs leading-snug line-clamp-2 font-body">{brief.hook}</p>
 
         {/* Format + Awareness row */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-muted text-xs bg-border px-1.5 py-0.5 rounded font-display font-bold uppercase tracking-wide">
+          <span className="text-muted text-[11px] bg-border px-1.5 py-0.5 rounded font-display font-bold uppercase tracking-wide">
             {brief.format}
           </span>
-          <span className="text-muted text-xs bg-border px-1.5 py-0.5 rounded">
+          <span className="text-muted text-[11px] bg-border px-1.5 py-0.5 rounded">
             {brief.awareness_stage}
           </span>
         </div>
@@ -141,7 +141,7 @@ function KanbanCard({ card, col, onMove, onClick, onDelete }: {
         {brief.offer && (
           <div className="flex items-center gap-1.5">
             <Tag size={10} className="text-text-dim flex-shrink-0" />
-            <span className="text-text-dim text-xs truncate">{brief.offer}</span>
+            <span className="text-text-dim text-xs truncate font-body">{brief.offer}</span>
           </div>
         )}
 
@@ -249,7 +249,7 @@ export default function KanbanBoard({ cards, onStatusChange, onCardClick, onRefr
               <span className={`text-xs font-display font-extrabold uppercase tracking-widest ${col.headerText}`}>
                 {col.label}
               </span>
-              <span className="ml-auto text-xs bg-black/20 text-white/70 px-1.5 py-0.5 rounded-full font-display font-bold">
+              <span className="ml-auto text-xs bg-surface text-text-dim px-1.5 py-0.5 rounded-full font-medium border border-border/50">
                 {colCards.length}
               </span>
             </div>

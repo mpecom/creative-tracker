@@ -33,7 +33,7 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-display font-bold uppercase tracking-wide transition-all ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 active
                   ? 'bg-accent text-white'
                   : 'text-text-dim hover:text-text hover:bg-border'
@@ -50,13 +50,13 @@ export default function Sidebar() {
       <div className="px-3 py-4 border-t border-border space-y-1">
         <button
           onClick={toggle}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-display font-bold text-text-dim hover:text-text hover:bg-border transition-all"
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-text-dim hover:text-text hover:bg-border transition-all"
         >
           {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
           {theme === 'dark' ? 'Light mode' : 'Dark mode'}
         </button>
         <div className="px-3 pt-2">
-          <p className="text-muted text-[10px] font-display font-bold uppercase tracking-widest">
+          <p className="text-muted text-[10px] uppercase tracking-widest">
             NL · FR · DE · ES · IT
           </p>
         </div>
