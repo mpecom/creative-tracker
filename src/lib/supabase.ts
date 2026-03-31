@@ -1,10 +1,26 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
-export const supabaseAdmin = supabase
+// Anon client — used in client components and public reads
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }),
+  },
+})
+
+// Admin client — used ONLY in API routes (server-side).
+// Uses service role key to bypass RLS. Falls back to anon key if not set.
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+export const supabaseAdmin = serviceRoleKey
+  ? createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+      global: {
+        fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }),
+      },
+    })
+  : supabase
 
 export type Market = 'NL' | 'FR' | 'DE' | 'ES' | 'IT'
 export type CampaignType = 'ABO' | 'CBO'

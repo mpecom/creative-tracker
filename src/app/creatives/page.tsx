@@ -65,7 +65,7 @@ export default function Creatives() {
 
   const fetchData = useCallback(async () => {
     setLoading(true)
-    const res = await fetch(`/api/dashboard?days=${days}&market=${marketFilter}&angle=all`)
+    const res = await fetch(`/api/dashboard?days=${days}&market=${marketFilter}&angle=all`, { cache: 'no-store' })
     const json = await res.json()
     setCards(json.cards || [])
     setLoading(false)
@@ -74,14 +74,21 @@ export default function Creatives() {
   useEffect(() => { fetchData() }, [fetchData])
 
   const handleStatusChange = async (briefId: string, newStatus: BriefStatus) => {
+    // Optimistic update
     setCards(prev => prev.map(c =>
       c.brief.id === briefId ? { ...c, brief: { ...c.brief, status: newStatus } } : c
     ))
-    await fetch('/api/briefs', {
+    const res = await fetch('/api/briefs', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: briefId, status: newStatus }),
     })
+    // Re-fetch to confirm persistence; roll back on error
+    if (res.ok) {
+      fetchData()
+    } else {
+      fetchData() // re-fetch to revert optimistic update
+    }
   }
 
   const handleSort = (col: SortKey) => {

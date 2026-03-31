@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase, Brief, Creative, AdPerformance } from '@/lib/supabase'
+import { supabaseAdmin as supabase, Brief, Creative, AdPerformance } from '@/lib/supabase'
 import { aggregateCreativeCard } from '@/lib/aggregate'
+
+export const dynamic = 'force-dynamic'
 
 function buildTrend(adIds: string[], performances: AdPerformance[]) {
   const byDate: Record<string, { spend: number; revenue: number }> = {}
