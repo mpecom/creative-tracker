@@ -21,11 +21,15 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json()
   const { id, ...updates } = body
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('briefs')
     .update(updates)
     .eq('id', id)
+    .select('id')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (!data || data.length === 0) {
+    return NextResponse.json({ error: 'Update blocked — check RLS policies or row ID' }, { status: 403 })
+  }
   return NextResponse.json({ ok: true })
 }
 
